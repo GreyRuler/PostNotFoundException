@@ -1,7 +1,7 @@
 object WallService {
 
     val posts = mutableListOf<Post>()
-    private val comments = mutableListOf<Comment>()
+    val comments = mutableListOf<Comment>()
     private const val MAXID = 1_000_000_000 // обусловленно предположением в 1 млрд постов
 
     fun add(post: Post): Post {
@@ -49,7 +49,7 @@ object WallService {
         return false
     }
 
-    fun createComment(comment: Comment, ownerId: Int = 0, postId: Int = 0, message: String = "", replyToComment: Int = 0,
+    fun createComment(comment: Comment, postId: Int, ownerId: Int = 0, message: String = "", replyToComment: Int = 0,
                       attachments: List<Attachment> = mutableListOf(), stickerId: Int = 0, guid: String = "0",
                       fromGroup: Int = 0) {
         if (posts.any { it.id == postId }) {
