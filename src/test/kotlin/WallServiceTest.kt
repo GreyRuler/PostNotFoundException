@@ -346,7 +346,7 @@ class WallServiceTest {
     @Test
     fun createComment_shouldAddComment() {
         val post = Post(
-            id = 57,
+            id = 0,
             ownerId = 1,
             fromId = (0..10000).random(),
             createdBy = (0..10000).random(),
@@ -400,9 +400,10 @@ class WallServiceTest {
                 )
             )
         )
+        val postReturn = WallService.add(post)
         val comment = Comment(
             id = 1,
-            fromId = (0..100).random(),
+            fromId = postReturn.id,
             date = Clock.System.now().epochSeconds.toInt(),
             text = "Hello",
             donut = Post.Donut(
@@ -441,12 +442,10 @@ class WallServiceTest {
                 groupsCanPost = true
             )
         )
-        val postId = 57
 
-        WallService.posts.add(post)
-        WallService.createComment(comment, postId)
+        val result = WallService.createComment(comment)
 
-        assertTrue(WallService.comments.isNotEmpty())
+        assertTrue(result)
     }
 
     @Test(expected = PostNotFoundException::class)
@@ -506,9 +505,10 @@ class WallServiceTest {
                 )
             )
         )
+        WallService.add(post)
         val comment = Comment(
             id = 1,
-            fromId = (0..100).random(),
+            fromId = 1,
             date = Clock.System.now().epochSeconds.toInt(),
             text = "Hello",
             donut = Post.Donut(
@@ -547,14 +547,13 @@ class WallServiceTest {
                 groupsCanPost = true
             )
         )
-        val postId = 0
 
-        WallService.posts.add(post)
-        WallService.createComment(comment, postId)
+        WallService.add(post)
+        WallService.createComment(comment)
     }
 
     @After
     fun clearArray() {
-        WallService.posts.clear()
+        WallService.postsClear()
     }
 }

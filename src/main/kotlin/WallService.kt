@@ -1,18 +1,12 @@
 object WallService {
 
-    val posts = mutableListOf<Post>()
-    val comments = mutableListOf<Comment>()
-    private const val MAXID = 1_000_000_000 // обусловленно предположением в 1 млрд постов
+    private val posts = mutableListOf<Post>()
+    private val comments = mutableListOf<Comment>()
+    private var postID = 0
 
     fun add(post: Post): Post {
-        var id: Int
-        do {
-            id = (0..MAXID).random()
-        } while (posts.any { it.id == id })
-
-        val olderPost = post.copy(id = id)
+        val olderPost = post.copy(id = ++postID)
         posts.add(olderPost)
-
         return olderPost
     }
 
@@ -42,20 +36,24 @@ object WallService {
                     donut = post.donut,
                     postponedId = post.postponedId
                 )
-                posts.set(posts.indexOf(postFromArr), copy)
+                posts[posts.indexOf(postFromArr)] = copy
                 return true
             }
         }
         return false
     }
 
-    fun createComment(comment: Comment, postId: Int, ownerId: Int = 0, message: String = "", replyToComment: Int = 0,
-                      attachments: List<Attachment> = mutableListOf(), stickerId: Int = 0, guid: String = "0",
-                      fromGroup: Int = 0) {
-        if (posts.any { it.id == postId }) {
+    fun createComment(comment: Comment): Boolean {
+        if (posts.any { it.id == comment.fromId }) {
             comments.add(comment)
+            return true
         } else {
-            throw PostNotFoundException("В массиве отсутствует пост с id равный postId")
+            throw PostNotFoundException("В массиве отсутствует пост с id ${comment.fromId}")
         }
     }
+
+    fun postsClear() {
+        posts.clear()
+    }
+
 }
